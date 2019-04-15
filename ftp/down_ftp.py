@@ -1,11 +1,11 @@
-mport os
+#!/bin/env python
+import os
 import sys
 from datetime import timedelta, datetime
 from ftplib import FTP
 host = '1.2.3.4'
-username = 'dsjfkdsf'
-password = 'dsfdsfdsf'
-
+username = 'xxxxxxxxx'
+password = 'xxxxxxx'
 
 yesterday = datetime.today() + timedelta(-1)
 yesterday_format = yesterday.strftime('%Y%m%d')
@@ -17,9 +17,9 @@ class FTPSync(object):
         self.conn.connect(host, 20022, 60)
         self.conn.login(username, password)
         self.conn.cwd('%s'%(yesterday_format))
-        if not os.path.exists('E:/%s'%(yesterday_format)):
-            os.mkdir('E:/%s'%(yesterday_format))
-        os.chdir('E:/%s'%(yesterday_format))
+        if not os.path.exists('/upload/check/%s'%(yesterday_format)):
+            os.mkdir('/upload/check/%s'%(yesterday_format))
+        os.chdir('/upload/check/%s'%(yesterday_format))
 
     def get_dirs_files(self):
         dir_res = []
@@ -42,13 +42,14 @@ class FTPSync(object):
         sys.stdout.write("FILES: %s"%files)
         sys.stdout.write("DIRS: %s"%dirs)
         for f in files:
-            sys.stdout.write("%s : %s"%(next_dir, f))
-            sys.stdout.write("download : %s"%os.path.abspath(f))
-            outf = open(f, "wb")
-            try:
-                self.conn.retrbinary("RETR %s"%f, outf.write)
-            finally:
-                outf.close()
+            if not os.path.exists('/upload/check/%s/%s'%(yesterday_format,f)):
+                sys.stdout.write("%s : %s"%(next_dir, f))
+                sys.stdout.write("download : %s"%os.path.abspath(f))
+                outf = open(f, "wb")
+                try:
+                    self.conn.retrbinary("RETR %s"%f, outf.write)
+                finally:
+                    outf.close()
         for d in dirs:
             os.chdir(local_curr_dir)
             self.conn.cwd(ftp_curr_dir)
