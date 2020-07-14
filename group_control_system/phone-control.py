@@ -5,11 +5,10 @@
 查看当前启动应用的包名:
 u2.connect_wifi().app_current()
 彩蛋视频: com.jifen.dandan
-火山极速版: com.ss.android.ugc.livelite
-快手极速版: com.kuaishou.nebula
-抖音极速版: com.ss.android.ugc.aweme.lite
+快手极速版: com.kuaishou.nebula time:5:30 hours
 刷宝短视频: com.jm.video
 趣头条: com.jifen.qukan
+
 """
 
 import os
@@ -91,7 +90,7 @@ def slide_vertical_kuaishou(start):
     d.watcher.when(xpath='//*[@text="设置青少年模式"]').when(xpath='//*[@resource-id="com.kuaishou.nebula:id/button"]/android.widget.LinearLayout[1]').click()
     d.watcher.when(xpath='//*[@text="立即邀请"]').when(xpath='//*[@resource-id="com.kuaishou.nebula:id/close"]').click()
     d.watcher.when(xpath='//*[@text="立即签到"]').click()
-    d.watcher.when(xpath='//*[@text="明天可领"]').when(xpath='//*[@resource-id="com.kuaishou.nebula:id/webView"]/android.webkit.WebView[1]/android.webkit.WebView[1]/android.view.View[16]/android.view.View[1]/android.view.View[1]').click()
+    d.watcher.when(xpath="//android.view.View[contains(@text, '签到成功加')]").when(xpath='//*[@resource-id="com.kuaishou.nebula:id/webView"]/android.webkit.WebView[1]/android.webkit.WebView[1]/android.view.View[16]/android.view.View[1]/android.view.View[1]').click()
     d.watcher.when(xpath='//*[@text="继续邀好友赚钱"]').when(xpath='//*[@resource-id="com.kuaishou.nebula:id/webView"]/android.webkit.WebView[1]/android.webkit.WebView[1]/android.view.View[16]/android.view.View[1]/android.view.View[1]/android.view.View[1]').click()
     d.watcher.when(xpath='//*[@resource-id="com.kuaishou.nebula:id/retry_network_text"]').click()
     d.watcher.start(interval=2.0)
@@ -130,7 +129,10 @@ def slide_vertical_kuaishou(start):
             randomY1 = random.randint(10, 100) + 700
             randomY2 = random.randint(10,100) + 100
             d.swipe(randomX1, randomY1, randomX1, randomY2, 0.1)
-            time.sleep(random.randint(15,20))
+            if d(text="点击进入直播间").exists or d.xpath('//*[@resource-id="com.kuaishou.nebula:id/open_long_atlas"]').exists:
+                time.sleep(random.randint(1, 2))
+            else:
+                time.sleep(random.randint(15, 20))
             like += 1
             # 模拟人工点赞
             if like == 35 and not d(text="点击进入直播间").exists:
@@ -174,12 +176,14 @@ def slide_horizontal_qutoutiao(start):
     devices_address = scan_list
     d = u2.connect_wifi("%s" % (devices_address[start]))
     d.app_start("com.jifen.qukan", stop=True)
-    time.sleep(25)
+    time.sleep(20)
     # 签到
-    d.xpath('//*[@resource-id="com.jifen.qukan:id/mq"]/android.widget.FrameLayout[4]/android.widget.LinearLayout[1]').click()
-    time.sleep(15)
+    if d.xpath('//*[@text="去签到"]').exists:
+        d.xpath('//*[@text="去签到"]').click_exists()
+    time.sleep(10)
     if d(text='恭喜获得'):
-        d.xpath('//*[@resource-id="com.jifen.qukan:id/vp"]').click()
+        d.xpath('//*[@resource-id="com.jifen.qukan:id/vv"]').click_exists()
+    d.xpath('//*[@text="任务"]').click_exists()
     # 进入我的页面
     d.xpath('//*[@text="我的"]').click()
     time.sleep(10)
@@ -191,26 +195,17 @@ def slide_horizontal_qutoutiao(start):
     while stop_threads:
         try:
             # 点击金蛋奖励
-            if d.xpath('//*[@resource-id="com.jifen.qukan.timerbiz:id/a"]').exists:
+            if d.xpath('//*[@resource-id="com.jifen.qukan:id/b0h"]').exists:
                 time.sleep(3)
-                d.xpath('//*[@resource-id="com.jifen.qukan.timerbiz:id/a"]').click()
+                d.xpath('//*[@resource-id="com.jifen.qukan:id/b0h"]').click()
                 time.sleep(3)
-                d.xpath('//*[@resource-id="com.jifen.qukan:id/vl"]').click()
-                time.sleep(60)
-                if d.xpath('//*[@resource-id="com.jifen.qukan:id/tt_video_ad_close_layout"]').exists:
-                    d.xpath('//*[@resource-id="com.jifen.qukan:id/tt_video_ad_close_layout"]').click()
-                elif d.xpath('//*[@text="关闭"]').exists:
-                    d.xpath('//*[@text="关闭"]').click()
-                    time.sleep(3)
-                    d.press("back")
-                else:
-                    d.press("back")
+                d.xpath('//*[@resource-id="com.jifen.qukan:id/vv"]').click()
             # END
             randomX1 = random.randint(10, 50) + 300
             randomY1 = random.randint(10, 100) + 600
             randomY2 = random.randint(10, 100) + 100
             d.swipe(randomX1, randomY1, randomX1, randomY2)
-            time.sleep(random.randint(50,65))
+            time.sleep(random.randint(30,40))
         except:
             print("%s: 设备模拟出现问题！" % (devices_address[start]))
 
@@ -248,6 +243,8 @@ def slide_horizontal_caidan(start):
     devices_address = scan_list
     d = u2.connect_wifi("%s" % (devices_address[start]))
     d.app_start("com.jifen.dandan", stop=True)
+    d.watcher.when(xpath='//*[@text="加载中"]/android.view.View[1]/android.view.View[2]/android.view.View[2]').click()
+    d.watcher.start(interval=2.0)
     time.sleep(20)
     # 每日签到
     d(resourceId="com.jifen.dandan:id/image_red_bg_icon").click()
@@ -299,80 +296,6 @@ def slide_horizontal_caidan_thread():
 # END
 
 
-# 火山极速视频
-def slide_horizontal_huoshan(start):
-    """
-    :param start:
-    :param stop:
-    :return:
-    """
-    scan_list = []
-    with open('phones.csv', 'r') as scan:
-        for i in scan.read().splitlines():
-            scan_list.append(i)
-    devices_address = scan_list
-    d = u2.connect_wifi("%s" % (devices_address[start]))
-    # 定义监控器
-    d.watcher.when(xpath='//*[@text="继续退出"]').click()
-    d.watcher.when(xpath='//*[@resource-id="com.ss.android.ugc.livelite:id/sc"]').when(xpath='//*[@text="领取"]').click()
-    d.watcher.when(xpath='//*[@text="加载中..."]').when(xpath='//*[@resource-id="com.ss.android.ugc.livelite:id/wt"]').click()
-    d.watcher.start(2.0)
-    d.app_start("com.ss.android.ugc.livelite", stop=True)
-    time.sleep(15)
-    # 跳过青少年模式
-    if d(text="开启青少年模式").exists:
-        d.xpath('//*[@resource-id="com.ss.android.ugc.livelite:id/r4"]').click()
-        time.sleep(8)
-    # 签到
-    d.xpath('//*[@resource-id="com.ss.android.ugc.livelite:id/wy"]').click()
-    if d(textContains="恭喜您获得").exists:
-        d.xpath('//*[@text="javascript:;"]').click()
-        d.press("back")
-    # END
-    # 火山每日福利视频2000金币
-    for i in range(1, 21):
-        if d.xpath('//*[@text="领100金币"]').exists:
-            d.xpath('//*[@text="领100金币"]').click()
-            time.sleep(30)
-            if d.xpath('//*[@text="关闭广告"]').exists:
-                d.xpath('//*[@text="关闭广告"]').click()
-                time.sleep(8)
-        else:
-            break
-    d.xpath('//*[@resource-id="com.ss.android.ugc.livelite:id/wt"]').click()
-    global stop_threads
-    while stop_threads:
-        try:
-            randomX1 = random.randint(10, 50) + 300
-            randomY1 = random.randint(10, 100) + 600
-            randomY2 = random.randint(10, 100) + 100
-            d.swipe(randomX1, randomY1, randomX1, randomY2)
-            time.sleep(random.randint(15, 25))
-        except:
-            print("%s: 设备模拟出现问题！" % (devices_address[start]))
-
-
-def slide_horizontal_huoshan_thread():
-    try:
-        global threads
-        scan_list = []
-        with open('phones.csv', 'r') as scan:
-            for i in scan.read().splitlines():
-                scan_list.append(i)
-        devices_address = scan_list
-        threads = []
-        for i in range(len(devices_address)):
-            thread = threading.Thread(target=slide_horizontal_huoshan, args=(i,))
-            threads.append(thread)
-
-        for t in threads:
-            t.setDaemon(True)
-            t.start()
-    except:
-        print("devices is error!")
-# END
-
-
 # 刷宝短视频
 def slide_horizontal_shuabao(start):
     """
@@ -390,32 +313,9 @@ def slide_horizontal_shuabao(start):
     d = u2.connect_wifi("%s" % (devices_address[start]))
     d.app_start("com.jm.video", stop=True)
     # 监控器
-    d.watcher.when(xpath='//*[@text="恭喜获得"]').when(xpath='//*[@resource-id="com.jm.video:id/imgClose"]').click()
+    d.watcher.when(xpath='//*[@text="去邀请"]').when(xpath='//*[@resource-id="com.jm.video:id/imgClose"]').click()
     d.watcher.start(2.0)
     time.sleep(15)
-    # 签到
-    d.xpath('//*[@resource-id="com.jm.video:id/tabLayout"]/android.widget.LinearLayout[1]/android.widget.RelativeLayout[4]').click()
-    time.sleep(10)
-    if d(text='立即签到').exists and not d.xpath('//*[@text="继续赚元宝"]').exists:
-        d(text='立即签到').click()
-        time.sleep(3)
-        if d.xpath('//*[@text="恭喜您获得"]').exists:
-            d.xpath('//*[@text="刷宝短视频"]/android.view.View[1]/android.view.View[6]/android.view.View[1]/android.view.View[1]').click()
-        else:
-            d.xpath('//*[@text="看视频签到"]').click()
-            time.sleep(40)
-            d.xpath('//*[@resource-id="com.jm.video:id/tt_video_ad_close_layout"]').click()
-            time.sleep(2)
-            d.xpath('//*[@text="刷宝短视频"]/android.view.View[1]/android.view.View[7]/android.view.View[1]/android.view.View[1]').click()
-            time.sleep(3)
-            d(scrollable=True).scroll.toEnd()
-            time.sleep(5)
-            d.xpath('//*[@text="去看看"]').click()
-    else:
-        d(scrollable=True).scroll.toEnd()
-        time.sleep(5)
-        d.xpath('//*[@text="去看看"]').click()
-    time.sleep(5)
     global stop_threads
     while stop_threads:
         try:
@@ -423,7 +323,10 @@ def slide_horizontal_shuabao(start):
             randomY1 = random.randint(10, 100) + 600
             randomY2 = random.randint(10, 100) + 100
             d.swipe(randomX1, randomY1, randomX1, randomY2)
-            time.sleep(random.randint(15, 25))
+            if d.xpath('//*[@resource-id="com.jm.video:id/textViewGoLiveFromVideoPop"]').exists:
+                time.sleep(random.randint(1, 2))
+            else:
+                time.sleep(random.randint(15, 25))
             like += 1
             # 模拟人工点赞
             if like == 20:
@@ -454,77 +357,7 @@ def slide_horizontal_shuabao_thread():
 # END
 
 
-# 抖音极速版
-def slide_vertical_douyin(start):
-    """
-    :param start: 定义每个手机设备的索引下标,根据下标执行对应的手机设备
-    :return:
-    """
-    scan_list = []
-    with open('phones.csv', 'r') as scan:
-        for i in scan.read().splitlines():
-            scan_list.append(i)
-    devices_address = scan_list
-    d = u2.connect_wifi("%s" % (devices_address[start]))
-    d.app_start("com.ss.android.ugc.aweme.lite", stop=True)
-    time.sleep(15)
-    # 定义监视器
-    d.watcher.when(xpath='//*[@text="进入儿童/青少年模式"]').when(xpath='//*[@text="我知道了"]').click()
-    d.watcher.start(interval=2.0)
-    # 抖音签到
-    d(resourceId="com.ss.android.ugc.aweme.lite:id/ay7").click_exists()
-    time.sleep(15)
-    if d(textContains="签到成功").exists:
-        d.xpath('//*[@text="Luckycat"]/android.view.View[1]/android.view.View[2]/android.view.View[2]/android.view.View[1]/android.view.View[1]/android.view.View[4]').click()
-        time.sleep(50)
-        d(text="关闭广告").click()
-        time.sleep(8)
-    d.press("back")
-    # END
-    global stop_threads
-    while stop_threads:
-        try:
-            # 定时开启抖音宝箱
-            if d(text="开宝箱").exists:
-                d(resourceId="com.ss.android.ugc.aweme.lite:id/ay7").click()
-                d(scrollable=True).scroll.toEnd()
-                d.xpath('//*[@content-desc="Luckycat"]/android.view.View[1]/android.view.View[4]').click()
-                time.sleep(10)
-                d(description="看视频，赚金币").click()
-                time.sleep(25)
-                d(text="关闭广告").click()
-                time.sleep(3)
-                d.press("back")
-            randomX1 = random.randint(10, 50) + 300
-            randomY1 = random.randint(10, 100) + 600
-            randomY2 = random.randint(10,100) + 100
-            d.swipe(randomX1, randomY1, randomX1, randomY2)
-            time.sleep(random.randint(15,35))
-        except:
-            print("%s: 设备模拟出现问题！" % (devices_address[start]))
-
-
-def slide_vertical_douyin_thread():
-    try:
-        global threads
-        scan_list = []
-        with open('phones.csv', 'r') as scan:
-            for i in scan.read().splitlines():
-                scan_list.append(i)
-        devices_address = scan_list
-        threads = []
-        for i in range(len(devices_address)):
-            thread = threading.Thread(target=slide_vertical_douyin, args=(i,))
-            threads.append(thread)
-
-        for t in threads:
-            t.setDaemon(True)
-            t.start()
-    except:
-        print("设备线程开启出现问题！")
 # END
-
-
 # 定义Ａpp关闭函数
 def stop_video(app_name):
     scan_list = []
@@ -553,17 +386,6 @@ height = 700
 size = "%dx%d+%d+%d" % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
 window.geometry(size)
 window.resizable(0, 0)
-
-b0 = tk.Button(window,
-    text='抖音极速',
-    width=8,
-    height=1,
-    activebackground='green',
-    bg='grey',
-    font=('微软雅黑',10,'bold'),
-    fg='yellow',
-    command=slide_vertical_douyin_thread)
-b0.place(x=0,y=100,anchor='nw')
 
 b1 = tk.Button(window,
     text='快手极速',
@@ -599,17 +421,6 @@ b3 = tk.Button(window,
 b3.place(x=240,y=100,anchor='nw')
 
 b4 = tk.Button(window,
-    text='火山极速版',
-    width=8,
-    height=1,
-    activebackground='green',
-    bg='grey',
-    font=('微软雅黑',10,'bold'),
-    fg='yellow',
-    command=slide_horizontal_huoshan_thread)
-b4.place(x=320,y=100,anchor='nw')
-
-b5 = tk.Button(window,
     text='彩蛋视频',
     width=8,
     height=1,
@@ -618,8 +429,7 @@ b5 = tk.Button(window,
     font=('微软雅黑',10,'bold'),
     fg='yellow',
     command=slide_horizontal_caidan_thread)
-b5.place(x=0,y=150,anchor='nw')
-
+b4.place(x=0,y=150,anchor='nw')
 columns = ("number", "factory", "model")
 style = ttk.Style(window)
 style.theme_use("clam")
@@ -676,14 +486,14 @@ b7 = tk.Button(window,
     command=scan_devices)
 b7.place(x=200,y=0,anchor='nw')
 # 定时执行群控系统APP
-# schedule.every().day.at("12:14:00").do(slide_vertical_kuaishou_thread)
-# schedule.every().day.at("12:16:00").do(stop_video, "com.kuaishou.nebula")
-# schedule.every().day.at("11:30:30").do(slide_horizontal_qutoutiao_thread)
-# schedule.every().day.at("15:30:00").do(stop_video, "com.jifen.qukan")
-# schedule.every().day.at("15:30:30").do(slide_horizontal_shuabao_thread)
-# schedule.every().day.at("19:30:00").do(stop_video, "com.jm.video")
-# schedule.every().day.at("19:30:30").do(slide_horizontal_caidan_thread)
-# schedule.every().day.at("21:30:00").do(stop_video, "com.jifen.dandan")
+# schedule.every().day.at("06:43:30").do(slide_vertical_kuaishou_thread)
+# schedule.every().day.at("12:00:00").do(stop_video, "com.kuaishou.nebula")
+# schedule.every().day.at("12:00:30").do(slide_horizontal_caidan_thread)
+# schedule.every().day.at("13:30:00").do(stop_video, "com.jifen.dandan")
+# schedule.every().day.at("13:30:30").do(slide_horizontal_shuabao_thread)
+# schedule.every().day.at("17:30:00").do(stop_video, "com.jm.video")
+# schedule.every().day.at("17:30:30").do(slide_horizontal_qutoutiao_thread)
+# schedule.every().day.at("21:00:00").do(stop_video, "com.jifen.qukan")
 
 # 定时执行扫描设备函数
 schedule.every(60).seconds.do(scan_devices)
